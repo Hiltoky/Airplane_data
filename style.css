@@ -1,0 +1,65 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-image: url(airplaneISproject.webp); /* Custom background image */
+    background-size: cover;
+    margin: 0;
+  }
+  
+  h1, h2, h3 {
+    color: #2e8b57; /* Font color for headings */
+  }
+  
+  .header {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  
+  .image-section {
+    text-align: center;
+    
+  }
+
+  
+  .image-section img {
+    width: 500px;
+    border-radius: 10px; /* Rounded corners for image */
+  }
+  
+  .video-section {
+    text-align: center;
+  }
+  
+  .tableau-section {
+    text-align: center;
+  }
+  
+  /* Navigation links */
+  .navigation {
+    text-align: center;
+  }
+  
+  .navigation a {
+    margin: 10px;
+    color: #2e8b57;
+    text-decoration: none;
+  }
+  
+  .navigation a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Footer styles */
+  .footer {
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+  }
+  

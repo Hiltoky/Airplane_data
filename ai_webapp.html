@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyWordle - Aviation Word Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #87CEEB, #4682B4);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    #game-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    #word-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 20px auto;
+      width: fit-content;
+    }
+
+    .letter-box {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    #keyboard {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 5px;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+
+    .key {
+      padding: 15px;
+      font-size: 1.2em;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #message {
+      font-size: 1.2em;
+      margin: 20px 0;
+      min-height: 24px;
+    }
+
+    #reset-btn {
+      padding: 10px 20px;
+      font-size: 1.1em;
+      background: #ff6b6b;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .correct {
+      background: #2ecc71 !important;
+      border-color: #2ecc71 !important;
+    }
+
+    .present {
+      background: #f1c40f !important;
+      border-color: #f1c40f !important;
+    }
+
+    .absent {
+      background: #e74c3c !important;
+      border-color: #e74c3c !important;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SkyWordle ✈️</h1>
+    <p>Guess the aviation word in 5 tries!</p>
+  </header>
+
+  <div id="game-container">
+    <div id="word-grid"></div>
+    <div id="message"></div>
+    <div id="keyboard"></div>
+    <button id="reset-btn" onclick="location.reload()">New Game</button>
+  </div>
+
+  <script>
+    const AVIATION_WORDS = ['WINGS', 'PILOT', 'FLAPS', 'AERIO', 'JETON', 'BOEIN'];
+    const targetWord = AVIATION_WORDS[Math.floor(Math.random() * AVIATION_WORDS.length)].toUpperCase();
+    let currentGuess = [];
+    let currentRow = 0;
+
+    function initGame() {
+      // Create word grid (5 rows)
+      const grid = document.getElementById('word-grid');
+      for (let i = 0; i < 5; i++) {
+        const row = document.createElement('div');
+        row.className = 'grid-row';
+        for (let j = 0; j < 5; j++) {
+          const box = document.createElement('div');
+          box.className = 'letter-box';
+          row.appendChild(box);
+        }
+        grid.appendChild(row);
+      }
+
+      // Create keyboard
+      const keyboard = document.getElementById('keyboard');
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(char => {
+        const key = document.createElement('button');
+        key.className = 'key';
+        key.textContent = char;
+        key.addEventListener('click', () => handleInput(char));
+        keyboard.appendChild(key);
+      });
+
+      // Keyboard controls
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitGuess();
+        else if (e.key === 'Backspace') deleteLetter();
+        else if (e.key.match(/^[a-z]$/i)) handleInput(e.key.toUpperCase());
+      });
+    }
+
+    function handleInput(char) {
+      if (currentGuess.length < 5) {
+        currentGuess.push(char);
+        updateGrid();
+      }
+    }
+
+    function deleteLetter() {
+      currentGuess.pop();
+      updateGrid();
+    }
+
+    function updateGrid() {
+      const row = document.getElementsByClassName('grid-row')[currentRow];
+      Array.from(row.children).forEach((box, i) => {
+        box.textContent = currentGuess[i] || '';
+      });
+    }
+
+    function submitGuess() {
+      if (currentGuess.length !== 5) return;
+
+      const guess = currentGuess.join('');
+      const row = document.getElementsByClassName('grid-row')[currentRow];
+      let correctCount = 0;
+
+      Array.from(row.children).forEach((box, i) => {
+        const letter = guess[i];
+        if (letter === targetWord[i]) {
+          box.classList.add('correct');
+          correctCount++;
+        } else if (targetWord.includes(letter)) {
+          box.classList.add('present');
+        } else {
+          box.classList.add('absent');
+        }
+      });
+
+      // Update keyboard colors
+      currentGuess.forEach((letter, i) => {
+        const key = Array.from(document.getElementsByClassName('key'))
+          .find(k => k.textContent === letter);
+        if (key) {
+          if (letter === targetWord[i]) {
+            key.classList.add('correct');
+          } else if (targetWord.includes(letter)) {
+            key.classList.add('present');
+          } else {
+            key.classList.add('absent');
+          }
+          key.disabled = true;
+        }
+      });
+
+      if (correctCount === 5) {
+        showMessage('✈️ Congratulations! You guessed it! ✈️', true);
+      } else if (currentRow === 4) {  // After 5 attempts (0-4)
+        showMessage(`Maybe next time! The word was ${targetWord}`, false);
+      } else {
+        currentRow++;
+        currentGuess = [];
+      }
+    }
+
+    function showMessage(msg, isWin) {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = msg;
+      messageEl.style.color = isWin ? '#2ecc71' : '#e74c3c';
+    }
+
+    // Start the game
+    initGame();
+  </script>
+</body>
+</html>
